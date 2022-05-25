@@ -1,12 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Hexfall.HexElements
 {
     //odd q vertical layout
     public class HexGridLayout : MonoBehaviour
     {
+        //not: eğer x %2 = 1 ise y'si altta demektir koordinatta x 1 arttığında sağ üste erişir.
+        //collider'la almayı düşünebilirsin
+
+
         private const float SQRT_3 = 1.732050808f;
 
         [SerializeField] private Vector2 gridSize;
@@ -24,9 +26,8 @@ namespace Hexfall.HexElements
             {
                 for(int x = 0; x < gridSize.x; x++)
                 {
-                    Hexagon newTile = Instantiate(hexagon, HexPosition(x,y)*distanceMultiplier, transform.rotation,transform).AddComponent<Hexagon>();
-                    newTile.Initialize(Color.black, new Vector2(x, y));
-
+                    Hexagon newTile = Instantiate(hexagon, HexPosition(x, y) * distanceMultiplier, transform.rotation, transform).GetComponent<Hexagon>();
+                    newTile.Initialize(Color.yellow, new Vector2(x, y));
                 }
             }
         }

@@ -52,19 +52,32 @@ namespace Hexfall.HexElements
             }
 
         }
-        private float SetCoordinate(int maxGridSize)
+        private float SetCoordinate(Vector2Int coordinate)
         {
-            return 0; // coordiante.x yerine bu methoddan çağır sınır dışındaysa -1 olarak dönsün.
+            if (Coordinate.x % 2 == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return 0;
+            }
+ // coordiante.x yerine bu methoddan çağır sınır dışındaysa -1 olarak dönsün.
         }
         public void SelectHexagon()
         {
             SetColor(Color.red);
+        }
+        public void DeselectHexagon()
+        {
+            SetColor(Color.cyan);
         }
 
         private void OnMouseDown()
         {
             //Debug.Log(Coordinate+" GameManager'dan Coordinate girerek çağır seçme fonksiyonunu"); // Button kullanılabilir mi?
             GameManager.instance.SelectHexagon(Coordinate);
+            Debug.Log(Vector2.Angle(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)- transform.position));
 
         }
     }

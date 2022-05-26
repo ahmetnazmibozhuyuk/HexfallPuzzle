@@ -17,12 +17,7 @@ namespace Hexfall.Managers
 
         public void SelectHexagon(Vector2Int hexCoordinates)
         {
-            Debug.Log(MainGrid.HexArray[hexCoordinates.x, hexCoordinates.y].Coordinate);
             MainGrid.ShowNeighbors(hexCoordinates);
-        }
-
-        public void AssignNeighbors()
-        {
 
         }
     }

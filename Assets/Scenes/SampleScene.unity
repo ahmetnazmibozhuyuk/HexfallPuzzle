@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 220563899}
   - component: {fileID: 220563900}
+  - component: {fileID: 220563901}
   m_Layer: 0
   m_Name: GridLayout
   m_TagString: Untagged
@@ -169,6 +170,18 @@ MonoBehaviour:
   gridSize: {x: 8, y: 9}
   hexagon: {fileID: 2673323477391088582, guid: 4f6b7fd2fcdb1744cb7d32d0a530c99e, type: 3}
   distanceMultiplier: 0.13
+--- !u!114 &220563901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220563898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3321e3033a904a944be3e9c9dbfc2c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

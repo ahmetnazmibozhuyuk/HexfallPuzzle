@@ -30,8 +30,6 @@ namespace Hexfall.HexElements
         }
         public void SetNeighbors(Vector2Int gridSize)
         {
-            //if()
-            //gridSize ile kenarda mı değil mi vs kontrol et
             if(Coordinate.x % 2 == 0)
             {
                 NeighborCoordinate[0] = new Vector2Int(Coordinate.x, Coordinate.y + 1);     //Top
@@ -52,18 +50,6 @@ namespace Hexfall.HexElements
             }
 
         }
-        private float SetCoordinate(Vector2Int coordinate)
-        {
-            if (Coordinate.x % 2 == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return 0;
-            }
- // coordiante.x yerine bu methoddan çağır sınır dışındaysa -1 olarak dönsün.
-        }
         public void SelectHexagon()
         {
             SetColor(Color.red);
@@ -73,11 +59,39 @@ namespace Hexfall.HexElements
             SetColor(Color.cyan);
         }
 
-        private void OnMouseDown()
+        private void OnMouseDown() // nasılsa ray ile yapıyosun inputtan düzgün hallet
+
         {
-            //Debug.Log(Coordinate+" GameManager'dan Coordinate girerek çağır seçme fonksiyonunu"); // Button kullanılabilir mi?
-            GameManager.instance.SelectHexagon(Coordinate);
-            Debug.Log(Vector2.Angle(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)- transform.position));
+            GameManager.instance.SelectHexagon(Coordinate,GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
+        }
+        private Vector2Int GetSelectDirection(Vector2 startPoint, Vector2 endPoint)
+        {
+            float angle = Mathf.Atan2(Camera.main.ScreenToWorldPoint(Input.mousePosition).y - transform.position.y,
+                Camera.main.ScreenToWorldPoint(Input.mousePosition).x - transform.position.x) * 180 / Mathf.PI;
+            if (angle < -120)
+            {
+                return new Vector2Int(4, 5);
+            }
+            else if(angle >= -120 && angle < -60)
+            {
+                return new Vector2Int(3, 4);
+            }
+            else if(angle >= -60 && angle < 0)
+            {
+                return new Vector2Int(2, 3);
+            }
+            else if(angle>= 0  && angle < 60)
+            {
+                return new Vector2Int(1, 2);
+            }
+            else if(angle>=60 && angle < 120)
+            {
+                return new Vector2Int(0, 1);
+            }
+            else
+            {
+                return new Vector2Int(5, 0);
+            }
 
         }
     }

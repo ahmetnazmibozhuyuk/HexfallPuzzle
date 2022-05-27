@@ -45,25 +45,25 @@ namespace Hexfall.HexElements
                 }
             }
         }
-        public void ShowNeighbors(Vector2Int coordinate)
+        public void ShowNeighbors(Vector2Int coordinate, Vector2Int neighborIndex)
         {
             DeselectHexagon();
 
             Vector2Int[] neighborCoordinate = HexArray[coordinate.x, coordinate.y].NeighborCoordinate;
-            int startPoint = 0, endPoint = 1; // todo :  bu kısım Vector2.Angle kısmından gelecek
-            SelectValidNeighbors(startPoint, endPoint, neighborCoordinate);
+            //int startPoint = 0, endPoint = 1; // todo :  bu kısım Vector2.Angle kısmından gelecek
+            SelectValidNeighbors(neighborIndex.x, neighborIndex.y, neighborCoordinate);
 
 
             _selectedHexList.Add(HexArray[coordinate.x, coordinate.y]);
 
             SelectHexagon();
         }
-        private void SelectValidNeighbors(int startPoint, int endPoint, Vector2Int[] neighborCoordinate)
+        private void SelectValidNeighbors(int startPoint, int endPoint, Vector2Int[] neighborCoordinate) // get neighboor values, rotate if not valid
         {
-            if(neighborCoordinate[startPoint].x < 0 || neighborCoordinate[startPoint].y < 0 || neighborCoordinate[endPoint].x < 0 || neighborCoordinate[endPoint].y < 0)
+            if (neighborCoordinate[startPoint].x < 0 || neighborCoordinate[startPoint].y < 0 || neighborCoordinate[endPoint].x < 0 || neighborCoordinate[endPoint].y < 0)
             {
                 _selectedHexList.Clear();
-                Debug.Log("not valid coordinate" + startPoint + endPoint);
+                //Debug.Log("not valid coordinate" + startPoint + endPoint);
                 startPoint++;
                 if (startPoint > 5) startPoint = 0;
                 endPoint++;
@@ -72,11 +72,11 @@ namespace Hexfall.HexElements
                 return;
             }
 
-            if (neighborCoordinate[startPoint].x > gridSize.x-1  || neighborCoordinate[startPoint].y > gridSize.y -1 ||
+            if (neighborCoordinate[startPoint].x > gridSize.x - 1 || neighborCoordinate[startPoint].y > gridSize.y - 1 ||
                 neighborCoordinate[endPoint].x > gridSize.x - 1 || neighborCoordinate[endPoint].y > gridSize.y - 1)
             {
                 _selectedHexList.Clear();
-                Debug.Log("not valid coordinate" + startPoint + endPoint);
+                //Debug.Log("not valid coordinate" + startPoint + endPoint);
                 startPoint++;
                 if (startPoint > 5) startPoint = 0;
                 endPoint++;
@@ -85,13 +85,8 @@ namespace Hexfall.HexElements
                 return;
             }
 
-                _selectedHexList.Add(HexArray[neighborCoordinate[startPoint].x, neighborCoordinate[startPoint].y]);
-                Debug.Log(startPoint + " " + endPoint);
-                _selectedHexList.Add(HexArray[neighborCoordinate[endPoint].x, neighborCoordinate[endPoint].y]);
-            
-
-
-
+            _selectedHexList.Add(HexArray[neighborCoordinate[startPoint].x, neighborCoordinate[startPoint].y]);
+            _selectedHexList.Add(HexArray[neighborCoordinate[endPoint].x, neighborCoordinate[endPoint].y]);
         }
         private void DeselectHexagon()
         {

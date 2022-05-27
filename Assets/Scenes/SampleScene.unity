@@ -169,6 +169,7 @@ MonoBehaviour:
   gridSize: {x: 8, y: 9}
   hexagonObject: {fileID: 2673323477391088582, guid: 4f6b7fd2fcdb1744cb7d32d0a530c99e, type: 3}
   distanceBetweenHex: 0.135
+  offscreenOffset: 30
   tileColor:
   - {r: 0.81621873, g: 0.13163051, b: 0.9622642, a: 1}
   - {r: 0.3537736, g: 0.86036295, b: 1, a: 1}

@@ -11,11 +11,12 @@ namespace Hexfall.HexElements
 
         [SerializeField] private GameObject highLightSprite;
 
-        public void Initialize(Color hexColor, Vector2Int coordinate) // color yerine tile type al
+        public void Initialize(Color hexColor, Vector2Int coordinate, bool isHighlighted) // color yerine tile type al
         {
             SetCoordinates(coordinate);
             SetColor(hexColor);
             NeighborCoordinate = new Vector2Int[6];
+            highLightSprite.SetActive(isHighlighted);
         }
 
         public void SetCoordinates(Vector2Int coordinate)
@@ -61,8 +62,8 @@ namespace Hexfall.HexElements
         private void OnMouseDown() // nasılsa ray ile yapıyosun inputtan düzgün hallet
 
         {
-            //GameManager.instance.SelectHexagon(Coordinate,GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
-            GameManager.instance.RemoveHexagon(Coordinate);
+            GameManager.instance.SelectHexagon(Coordinate, GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
+            //GameManager.instance.RemoveHexagon(Coordinate);
         }
 
         private Vector2Int GetSelectDirection(Vector2 startPoint, Vector2 endPoint)

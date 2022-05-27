@@ -7,6 +7,7 @@ namespace Hexfall.HexElements
         [SerializeField] private Vector2Int gridSize;
         [SerializeField] private GameObject hexagonObject;
         [SerializeField] private float distanceBetweenHex;
+        [SerializeField] private float offscreenOffset;
 
         [SerializeField] private Color[] tileColor;
 
@@ -18,7 +19,7 @@ namespace Hexfall.HexElements
 
             ClearGrid();
             _hexGridMainLayout = gameObject.AddComponent<HexGridLayout>();
-            _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,tileColor);
+            _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,offscreenOffset, tileColor);
         }
         public void ClearGrid()
         {

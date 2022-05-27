@@ -26,8 +26,8 @@ namespace Hexfall.Managers
         }
         public void RemoveHexagon(Vector2Int hexCoordinates)
         {
-            Debug.Log(MainGrid.HexArray[hexCoordinates.x, hexCoordinates.y].Coordinate);
-            MainGrid.RemoveHexagon(hexCoordinates);
+            //Debug.Log(MainGrid.HexArray[hexCoordinates.x, hexCoordinates.y].Coordinate);
+            //MainGrid.RemoveHexagon(hexCoordinates);
         }
     }
 

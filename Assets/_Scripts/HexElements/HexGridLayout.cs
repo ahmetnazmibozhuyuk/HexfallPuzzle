@@ -8,6 +8,12 @@ namespace Hexfall.HexElements
     // "odd q" Vertical Layout
 
     // creation, selection, remove vs şeklinde ufak classlara ayır
+
+
+    //eş bir renk bulduğunda bir eksiği ve bir fazlasını kontrol et
+
+
+    //merkeze bir obje yerleştir select dediğinde aktive olsun merkez pozisyona geçsin deaktivede deaktive olsun
     public class HexGridLayout : MonoBehaviour
     {
         public Hexagon[,] HexArray { get; private set; }
@@ -98,6 +104,25 @@ namespace Hexfall.HexElements
             _selectedHexList.Add(HexArray[coordinate.x, coordinate.y]);
             SelectHexagon();
         }
+        public void ShouldExplode(Vector2Int coordinate)
+        {
+            List<Hexagon> hexagonToExplode = new List<Hexagon>();
+            Vector2Int[] neighborCoordinate = HexArray[coordinate.x, coordinate.y].NeighborCoordinate;
+            for (int i = 0; i < 6; i++)
+            {
+
+                if (!NeighborIsValid(i, neighborCoordinate)) continue;
+                Debug.Log(HexArray[coordinate.x,coordinate.y].HexColor == HexArray[HexArray[coordinate.x, coordinate.y].NeighborCoordinate[i].x, HexArray[coordinate.x, coordinate.y].NeighborCoordinate[i].y].HexColor);
+            }
+        }
+        private void CheckNeighborConnection(int index)
+        {
+            for(int i = 0; i <2; i++)
+            {
+                // iki sonrası ve üç öncesini sırayla kontrol et; eğer aynı değilse break
+                NextNeighbor(index);
+            }
+        }
         private void SelectValidNeighbors(int startPoint, int endPoint, Vector2Int[] neighborCoordinate) // get neighboor values, rotate if not valid
         {
             if(NeighborIsValid(startPoint,neighborCoordinate) && NeighborIsValid(endPoint, neighborCoordinate))
@@ -113,6 +138,12 @@ namespace Hexfall.HexElements
         {
             index++;
             if (index > 5) return 0;
+            return index;
+        }
+        private int PreviousNeighbor(int index)
+        {
+            index--;
+            if (index < 0) return 5;
             return index;
         }
         private bool NeighborIsValid(int neighborIndex, Vector2Int[] neighborCoordinate)
@@ -154,5 +185,7 @@ namespace Hexfall.HexElements
             }
             CreateTile(hexCoordinate.x, HexArray.GetLength(1) - 1);
         }
+
+
     }
 }

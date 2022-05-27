@@ -5,10 +5,11 @@ namespace Hexfall.HexElements
 {
     public class Hexagon : MonoBehaviour
     {
-        // komşuları almak yerine komşuları ver mesela bu düştüğünde sol altındakinin sağ üst komşusunu kendisi yapsın
         public Color HexColor { get; private set; } // random seçilecek
         public Vector2Int Coordinate { get; private set; }
         public Vector2Int[] NeighborCoordinate { get; private set; }
+
+        [SerializeField] private GameObject highLightSprite;
 
         public void Initialize(Color hexColor, Vector2Int coordinate) // color yerine tile type al
         {
@@ -48,15 +49,14 @@ namespace Hexfall.HexElements
                 NeighborCoordinate[4] = new Vector2Int(Coordinate.x - 1, Coordinate.y - 1);     //Bot left
                 NeighborCoordinate[5] = new Vector2Int(Coordinate.x - 1, Coordinate.y);        //Top Left
             }
-
         }
         public void SelectHexagon()
         {
-            SetColor(Color.red);
+            highLightSprite.SetActive(true);
         }
         public void DeselectHexagon()
         {
-            SetColor(Color.cyan);
+            highLightSprite.SetActive(false);
         }
 
         private void OnMouseDown() // nasılsa ray ile yapıyosun inputtan düzgün hallet
@@ -64,6 +64,7 @@ namespace Hexfall.HexElements
         {
             GameManager.instance.SelectHexagon(Coordinate,GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
         }
+
         private Vector2Int GetSelectDirection(Vector2 startPoint, Vector2 endPoint)
         {
             float angle = Mathf.Atan2(Camera.main.ScreenToWorldPoint(Input.mousePosition).y - transform.position.y,

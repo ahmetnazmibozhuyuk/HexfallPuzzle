@@ -14,34 +14,37 @@ namespace Hexfall.HexElements
 
         private const float SQRT_3 = 1.732050808f;
 
-        [SerializeField] private Vector2Int gridSize;
-        [SerializeField] private GameObject hexagon;
+        private Vector2Int _gridSize;
+        private GameObject _hexagon;
 
-        [SerializeField] private float distanceMultiplier;
+        private float _distanceMultiplier;
+
+        private Color[] _tileColor;
 
 
         private List<Hexagon> _selectedHexList = new List<Hexagon>();
 
-        private void Start()
+        public void Initialize(Vector2Int gridSize, GameObject hexagonObject, float disanceBetweenHex, Color[] tileColor)
         {
+            _gridSize = gridSize;
+            _hexagon = hexagonObject;
+            _distanceMultiplier = disanceBetweenHex;
+            _tileColor = tileColor;
             LayoutGrid();
             GameManager.instance.AssignMainGrid(this);
-        }
-        public void Initialize()
-        {
-            //Spawn grid tarzı bir yerden initialize edilecek hale getir. Grid seçme vs düzgün ayarlansın
+
         }
         private void LayoutGrid()
         {
-            HexArray = new Hexagon[gridSize.x, gridSize.y];
-            for (int y = 0; y < gridSize.y; y++)
+            HexArray = new Hexagon[_gridSize.x, _gridSize.y];
+            for (int y = 0; y < _gridSize.y; y++)
             {
-                for (int x = 0; x < gridSize.x; x++)
+                for (int x = 0; x < _gridSize.x; x++)
                 {
-                    Hexagon newTile = Instantiate(hexagon, HexPosition(x, y) * distanceMultiplier, transform.rotation, transform).GetComponent<Hexagon>();
-                    newTile.Initialize(Color.cyan, new Vector2Int(x, y));
+                    Hexagon newTile = Instantiate(_hexagon, HexPosition(x, y) * _distanceMultiplier, transform.rotation, transform).GetComponent<Hexagon>();
+                    newTile.Initialize(_tileColor[Random.Range(0,_tileColor.Length)], new Vector2Int(x, y));
                     HexArray[x, y] = newTile;
-                    HexArray[x, y].SetNeighbors(gridSize);
+                    HexArray[x, y].SetNeighbors(_gridSize);
                 }
             }
         }
@@ -72,8 +75,8 @@ namespace Hexfall.HexElements
                 return;
             }
 
-            if (neighborCoordinate[startPoint].x > gridSize.x - 1 || neighborCoordinate[startPoint].y > gridSize.y - 1 ||
-                neighborCoordinate[endPoint].x > gridSize.x - 1 || neighborCoordinate[endPoint].y > gridSize.y - 1)
+            if (neighborCoordinate[startPoint].x > _gridSize.x - 1 || neighborCoordinate[startPoint].y > _gridSize.y - 1 ||
+                neighborCoordinate[endPoint].x > _gridSize.x - 1 || neighborCoordinate[endPoint].y > _gridSize.y - 1)
             {
                 _selectedHexList.Clear();
                 //Debug.Log("not valid coordinate" + startPoint + endPoint);
@@ -104,6 +107,18 @@ namespace Hexfall.HexElements
                 _selectedHexList[i].SelectHexagon();
 
             }
+        }
+        public void ClearEverything()
+        {
+            for(int i = 0; i < HexArray.GetLength(0); i++)
+            {
+                for(int j = 0; j < HexArray.GetLength(1); j++)
+                {
+                    Destroy(HexArray[i, j].gameObject);
+                    HexArray[i, j] = null;
+                }
+            }
+            Destroy(this);
         }
 
         private Vector2 HexPosition(float x, float y)

@@ -1,26 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Hexfall.HexElements
 {
     public class SpawnGrid : MonoBehaviour
     {
-        private HexGridLayout _hexGridLayout;
-        // Start is called before the first frame update
+        [SerializeField] private Vector2Int gridSize;
+        [SerializeField] private GameObject hexagonObject;
+        [SerializeField] private float distanceBetweenHex;
 
-        //Grid burdan instantiate olur; variablelar vs burdan verilir, gridlayout listesi gridout içinde initialize edilirken
-        //referans olarak gamemanager'a iletilir
-        void Start()
+        [SerializeField] private Color[] tileColor;
+
+        private HexGridLayout _hexGridMainLayout;
+
+
+        public void SpawnNewGrid()
         {
-            //_hexGridLayout = new HexGridLayout();
-            //_hexGridLayout.Initialize()
+
+            ClearGrid();
+            _hexGridMainLayout = gameObject.AddComponent<HexGridLayout>();
+            _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,tileColor);
+        }
+        public void ClearGrid()
+        {
+            if (_hexGridMainLayout != null) _hexGridMainLayout.ClearEverything();
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
+
     }
 }

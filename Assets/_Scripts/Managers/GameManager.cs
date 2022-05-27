@@ -24,6 +24,11 @@ namespace Hexfall.Managers
             MainGrid.ShowNeighbors(hexCoordinates, neighborIndex);
 
         }
+        public void RemoveHexagon(Vector2Int hexCoordinates)
+        {
+            Debug.Log(MainGrid.HexArray[hexCoordinates.x, hexCoordinates.y].Coordinate);
+            MainGrid.RemoveHexagon(hexCoordinates);
+        }
     }
 
 }

@@ -13,7 +13,6 @@ namespace Hexfall.HexElements
 
         public void Initialize(Color hexColor, Vector2Int coordinate) // color yerine tile type al
         {
-
             SetCoordinates(coordinate);
             SetColor(hexColor);
             NeighborCoordinate = new Vector2Int[6];
@@ -62,7 +61,8 @@ namespace Hexfall.HexElements
         private void OnMouseDown() // nasılsa ray ile yapıyosun inputtan düzgün hallet
 
         {
-            GameManager.instance.SelectHexagon(Coordinate,GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
+            //GameManager.instance.SelectHexagon(Coordinate,GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
+            GameManager.instance.RemoveHexagon(Coordinate);
         }
 
         private Vector2Int GetSelectDirection(Vector2 startPoint, Vector2 endPoint)

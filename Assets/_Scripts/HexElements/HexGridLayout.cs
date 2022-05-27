@@ -4,12 +4,9 @@ using Hexfall.Managers;
 
 namespace Hexfall.HexElements
 {
-    //odd q vertical layout
+    // "odd q" Vertical Layout
     public class HexGridLayout : MonoBehaviour
     {
-        //not: eğer x %2 = 1 ise y'si altta demektir koordinatta x 1 arttığında sağ üste erişir.
-        //collider'la almayı düşünebilirsin
-
         public Hexagon[,] HexArray { get; private set; }
 
         private const float SQRT_3 = 1.732050808f;
@@ -30,24 +27,57 @@ namespace Hexfall.HexElements
             _hexagon = hexagonObject;
             _distanceMultiplier = disanceBetweenHex;
             _tileColor = tileColor;
-            LayoutGrid();
+            CreateGrid();
             GameManager.instance.AssignMainGrid(this);
 
         }
-        private void LayoutGrid()
+        #region Grid Layout Creation - Clearing
+        private void CreateGrid()
         {
             HexArray = new Hexagon[_gridSize.x, _gridSize.y];
             for (int y = 0; y < _gridSize.y; y++)
             {
                 for (int x = 0; x < _gridSize.x; x++)
                 {
-                    Hexagon newTile = Instantiate(_hexagon, HexPosition(x, y) * _distanceMultiplier, transform.rotation, transform).GetComponent<Hexagon>();
-                    newTile.Initialize(_tileColor[Random.Range(0,_tileColor.Length)], new Vector2Int(x, y));
-                    HexArray[x, y] = newTile;
-                    HexArray[x, y].SetNeighbors(_gridSize);
+                    CreateTile(x,y);
                 }
             }
         }
+        private void CreateTile(int coordinateX, int coordinateY)
+        {
+            Hexagon newTile = Instantiate(_hexagon, HexPosition(coordinateX, coordinateY), transform.rotation, transform).GetComponent<Hexagon>();
+            newTile.Initialize(_tileColor[Random.Range(0, _tileColor.Length)], new Vector2Int(coordinateX, coordinateY));
+            HexArray[coordinateX, coordinateY] = newTile;
+            HexArray[coordinateX, coordinateY].SetNeighbors(_gridSize);
+        }
+        private Vector2 HexPosition(float x, float y)
+        {
+            if (x % 2 == 1)
+            {
+                return new Vector2(x * 3, y * 2 * SQRT_3 - SQRT_3)*_distanceMultiplier;
+            }
+            else
+            {
+                return new Vector2(x * 3, y * 2 * SQRT_3)*_distanceMultiplier;
+            }
+        }
+        public void ClearEverything()
+        {
+            for (int i = 0; i < HexArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < HexArray.GetLength(1); j++)
+                {
+                    if (HexArray[i, j] == null) continue;
+                    Destroy(HexArray[i, j].gameObject);
+                    HexArray[i, j] = null;
+                }
+            }
+            Destroy(this);
+        }
+        #endregion
+
+        #region Selection
+
         public void ShowNeighbors(Vector2Int coordinate, Vector2Int neighborIndex)
         {
             DeselectHexagon();
@@ -108,33 +138,25 @@ namespace Hexfall.HexElements
 
             }
         }
-        public void ClearEverything()
-        {
-            for(int i = 0; i < HexArray.GetLength(0); i++)
-            {
-                for(int j = 0; j < HexArray.GetLength(1); j++)
-                {
-                    Destroy(HexArray[i, j].gameObject);
-                    HexArray[i, j] = null;
-                }
-            }
-            Destroy(this);
-        }
 
-        private Vector2 HexPosition(float x, float y)
+        #endregion
+
+        public void RemoveHexagon(Vector2Int hexCoordinate)
         {
-            if (x % 2 == 1)
+            // todo : Destroy yerine oluşturacağın Pool'dan çek
+            Destroy(HexArray[hexCoordinate.x, hexCoordinate.y].gameObject);
+            for(int y = hexCoordinate.y+1; y < HexArray.GetLength(1); y++)
             {
-                return new Vector2(x * 3, y * 2 * SQRT_3 - SQRT_3);
+                Debug.Log("relocate " + y);
+                Vector2Int newCoordinates = new Vector2Int(hexCoordinate.x, y - 1);
+                HexArray[hexCoordinate.x, y].transform.position = HexPosition(newCoordinates.x, newCoordinates.y);
+                HexArray[hexCoordinate.x, y].SetCoordinates(newCoordinates);
+                HexArray[newCoordinates.x, newCoordinates.y] = HexArray[hexCoordinate.x, y];
             }
-            else
-            {
-                return new Vector2(x * 3, y * 2 * SQRT_3);
-            }
+
+            //create tile dotween ile düşecek hepsi bittiğinde game state değişecek vs
+            CreateTile(hexCoordinate.x, HexArray.GetLength(1) - 1);
         }
-    }
-    public enum TileType
-    {
 
     }
 }

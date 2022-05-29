@@ -3,15 +3,23 @@ using UnityEngine;
 
 namespace Hexfall.Managers
 {
+    
     public class GameManager : Singleton<GameManager>
     {
-
-        //oyun stateleri: başlama öncesi, taşların oturması, rotasyon ve kontrol
-
-
+        public GameState CurrentState { get; private set; }
 
         public HexGridLayout MainGrid { get; private set; }
         
+        public Vector2Int ActiveHexCoordinate { get; private set; }
+        public Vector2Int SelectDirection { get; private set; }
+        public void SetActiveHex( Vector2Int activeHexCoordinate)
+        {
+            ActiveHexCoordinate = activeHexCoordinate;
+        }
+        public void SetSelectDirection(Vector2Int selectDirection)
+        {
+            SelectDirection = selectDirection;
+        }
 
         public void AssignMainGrid( HexGridLayout gridToAssign)
         {
@@ -19,17 +27,59 @@ namespace Hexfall.Managers
 
         }
 
-        public void SelectHexagon(Vector2Int hexCoordinates, Vector2Int neighborIndex)
+        private void SelectHexagon()
         {
-            //MainGrid.ShowNeighbors(hexCoordinates, neighborIndex);
-            MainGrid.ExplodeMatchingHexagons();
+            MainGrid.ShowNeighbors(ActiveHexCoordinate, SelectDirection);
+
 
         }
-        public void RemoveHexagon(Vector2Int hexCoordinates)
+        public void PressAction()
         {
-            //Debug.Log(MainGrid.HexArray[hexCoordinates.x, hexCoordinates.y].Coordinate);
-            //MainGrid.RemoveHexagon(hexCoordinates);
+            SelectHexagon();
         }
+        public void SwipeAction(bool clockwise)
+        {
+            //SelectHexagon();
+            MainGrid.RotateSelection(clockwise);
+        }
+
+
+
+        public void ChangeState(GameState newState)
+        {
+            if (CurrentState == newState) return;
+
+            CurrentState = newState;
+            switch (newState)
+            {
+                case GameState.BreakAndFill:
+
+                    break;
+                case GameState.CanInteract:
+
+                    break;
+                case GameState.Rotation:
+
+                    break;
+                case GameState.GameWon:
+
+                    break;
+                case GameState.GameLost:
+
+                    break;
+                default:
+                    throw new System.ArgumentException("Invalid game state selection.");
+            }
+        }
+    }
+    public enum GameState
+    {
+        GamePreStart = 0,
+        BreakAndFill = 1,
+        CanInteract = 2,
+        Rotation = 3,
+        GameWon = 4,
+        GameLost = 5,
     }
 
 }

@@ -15,13 +15,13 @@ namespace Hexfall.HexElements
         {
             SetCoordinates(coordinate);
             SetColor(hexColor);
-            NeighborCoordinate = new Vector2Int[6];
             highLightSprite.SetActive(isHighlighted);
         }
 
         public void SetCoordinates(Vector2Int coordinate)
         {
             Coordinate = coordinate;
+            SetNeighbors();
         }
 
         private void SetColor(Color hexColor)
@@ -29,9 +29,10 @@ namespace Hexfall.HexElements
             gameObject.GetComponent<SpriteRenderer>().color = hexColor;
             HexColor = hexColor;
         }
-        public void SetNeighbors(Vector2Int gridSize)
+        public void SetNeighbors()
         {
-            if(Coordinate.x % 2 == 0)
+            NeighborCoordinate = new Vector2Int[6];
+            if (Coordinate.x % 2 == 0)
             {
                 NeighborCoordinate[0] = new Vector2Int(Coordinate.x, Coordinate.y + 1);     //Top
                 NeighborCoordinate[1] = new Vector2Int(Coordinate.x + 1, Coordinate.y + 1);     //Top right
@@ -53,20 +54,21 @@ namespace Hexfall.HexElements
         public void SelectHexagon()
         {
             highLightSprite.SetActive(true);
+            Debug.Log(Coordinate);
         }
         public void DeselectHexagon()
         {
             highLightSprite.SetActive(false);
         }
-
-        private void OnMouseDown() // nasılsa ray ile yapıyosun inputtan düzgün hallet
-
+        private void OnMouseEnter()
         {
-            GameManager.instance.SelectHexagon(Coordinate, GetSelectDirection(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition)));
-            //GameManager.instance.RemoveHexagon(Coordinate);
+            GameManager.instance.SetActiveHex(Coordinate);
         }
-
-        private Vector2Int GetSelectDirection(Vector2 startPoint, Vector2 endPoint)
+        private void OnMouseDown()
+        {
+            GameManager.instance.SetSelectDirection(GetSelectDirection());
+        }
+        private Vector2Int GetSelectDirection()
         {
             float angle = Mathf.Atan2(Camera.main.ScreenToWorldPoint(Input.mousePosition).y - transform.position.y,
                 Camera.main.ScreenToWorldPoint(Input.mousePosition).x - transform.position.x) * 180 / Mathf.PI;
@@ -74,19 +76,19 @@ namespace Hexfall.HexElements
             {
                 return new Vector2Int(4, 5);
             }
-            else if(angle >= -120 && angle < -60)
+            else if (angle >= -120 && angle < -60)
             {
                 return new Vector2Int(3, 4);
             }
-            else if(angle >= -60 && angle < 0)
+            else if (angle >= -60 && angle < 0)
             {
                 return new Vector2Int(2, 3);
             }
-            else if(angle>= 0  && angle < 60)
+            else if (angle >= 0 && angle < 60)
             {
                 return new Vector2Int(1, 2);
             }
-            else if(angle>=60 && angle < 120)
+            else if (angle >= 60 && angle < 120)
             {
                 return new Vector2Int(0, 1);
             }

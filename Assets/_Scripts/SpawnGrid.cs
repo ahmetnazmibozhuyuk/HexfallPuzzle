@@ -13,7 +13,6 @@ namespace Hexfall.HexElements
 
         private HexGridLayout _hexGridMainLayout;
 
-
         public void SpawnNewGrid()
         {
 
@@ -25,7 +24,5 @@ namespace Hexfall.HexElements
         {
             if (_hexGridMainLayout != null) _hexGridMainLayout.ClearEverything();
         }
-
-
     }
 }

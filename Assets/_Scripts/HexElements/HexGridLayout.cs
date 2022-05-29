@@ -12,6 +12,9 @@ namespace Hexfall.HexElements
     //eş bir renk bulduğunda bir eksiği ve bir fazlasını kontrol et
 
     //merkeze bir obje yerleştir select dediğinde aktive olsun merkez pozisyona geçsin deaktivede deaktive olsun
+
+
+    //ayrımları düzgün yap; genel selection kısmı static olabilir sonraki önceki index vs mesela ya da valid grid selection gibi
     public class HexGridLayout : MonoBehaviour
     {
         public Hexagon[,] HexArray { get; private set; }
@@ -114,7 +117,27 @@ namespace Hexfall.HexElements
         {
             return HexArray[HexArray[baseCoordinate.x, baseCoordinate.y].NeighborCoordinate[neighborIndex].x, HexArray[baseCoordinate.x, baseCoordinate.y].NeighborCoordinate[neighborIndex].y];
         }
-        public void ShouldExplode(Vector2Int coordinate)
+        public void ExplodeMatchingHexagons()
+        {
+            for (int i = 0; i < HexArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < HexArray.GetLength(1); j++)
+                {
+                    //if (HexArray[i, j] == null) continue;
+                    ////Destroy(HexArray[i, j].gameObject);
+                    //ObjectPool.Despawn(HexArray[i, j].gameObject);
+                    //HexArray[i, j] = null;
+                    ShouldExplode(HexArray[i, j].Coordinate);
+                }
+            }
+            for(int i = 0; i < _hexagonToDestroy.Count; i++) 
+            {
+                RemoveHexagon(_hexagonToDestroy[i].Coordinate);
+            }
+            _hexagonToDestroy.Clear();
+
+        }
+        private void ShouldExplode(Vector2Int coordinate)
         {
             Color selectedColor = HexArray[coordinate.x, coordinate.y].HexColor;
             Vector2Int[] neighborCoordinate = HexArray[coordinate.x, coordinate.y].NeighborCoordinate;
@@ -139,7 +162,7 @@ namespace Hexfall.HexElements
             List<Hexagon> hexagonToExplode = new List<Hexagon>();
             hexagonToExplode.Add(HexArray[coordinate.x, coordinate.y]);
             int forwardIndex = index;
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
                 if (!NeighborIsValid(forwardIndex, HexArray[coordinate.x, coordinate.y].NeighborCoordinate)) break;
                 if (Neighbor(coordinate, forwardIndex).HexColor == colorToMatch)
@@ -190,14 +213,12 @@ namespace Hexfall.HexElements
                 }
                 hexagonToExplode.Clear();
             }
+
             for (int i = 0; i < hexagonToExplode.Count; i++)
             {
-                Debug.Log(hexagonToExplode[i].Coordinate);
-            }
-            Debug.Log(hexagonToExplode.Count);
-            for (int i = 0; i < hexagonToExplode.Count; i++)
-            {
-                RemoveHexagon(hexagonToExplode[i].Coordinate);
+                //RemoveHexagon(hexagonToExplode[i].Coordinate);
+                if (!_hexagonToDestroy.Contains(hexagonToExplode[i]))
+                    _hexagonToDestroy.Add(hexagonToExplode[i]);
             }
 
 
@@ -231,7 +252,6 @@ namespace Hexfall.HexElements
         private Vector2Int _gridSize;
         public TrioSelection(Hexagon[,] hexArray, Vector2Int gridSize)
         {
-            //burdan dependency inject
             _hexArray = hexArray;
             _gridSize = gridSize;
         }

@@ -22,7 +22,7 @@ namespace Hexfall.Managers
         public void SelectHexagon(Vector2Int hexCoordinates, Vector2Int neighborIndex)
         {
             //MainGrid.ShowNeighbors(hexCoordinates, neighborIndex);
-            MainGrid.ShouldExplode(hexCoordinates);
+            MainGrid.ExplodeMatchingHexagons();
 
         }
         public void RemoveHexagon(Vector2Int hexCoordinates)

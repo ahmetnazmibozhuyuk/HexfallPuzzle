@@ -39,7 +39,6 @@ namespace Hexfall.Managers
         }
         public void SwipeAction(bool clockwise)
         {
-            //SelectHexagon();
             MainGrid.RotateSelection(clockwise);
         }
 

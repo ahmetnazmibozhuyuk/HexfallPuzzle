@@ -54,7 +54,7 @@ namespace Hexfall.HexElements
         public void SelectHexagon()
         {
             highLightSprite.SetActive(true);
-            Debug.Log(Coordinate);
+            //Debug.Log(Coordinate);
         }
         public void DeselectHexagon()
         {

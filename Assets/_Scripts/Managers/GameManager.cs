@@ -1,9 +1,10 @@
 ﻿using Hexfall.HexElements;
 using UnityEngine;
+using TMPro;
 
 namespace Hexfall.Managers
 {
-    
+    [RequireComponent(typeof(UIManager))]
     public class GameManager : Singleton<GameManager>
     {
         public GameState CurrentState { get; private set; }
@@ -12,6 +13,17 @@ namespace Hexfall.Managers
         
         public Vector2Int ActiveHexCoordinate { get; private set; }
         public Vector2Int SelectDirection { get; private set; }
+        private UIManager _uiManager;
+        protected override void Awake()
+        {
+            base.Awake();
+            _uiManager = GetComponent<UIManager>();
+        }
+        private void Start()
+        {
+            ChangeState(GameState.GameAwaitingStart);
+        }
+
         public void SetActiveHex( Vector2Int activeHexCoordinate)
         {
             ActiveHexCoordinate = activeHexCoordinate;
@@ -24,14 +36,11 @@ namespace Hexfall.Managers
         public void AssignMainGrid( HexGridLayout gridToAssign)
         {
             MainGrid = gridToAssign;
-
         }
 
         private void SelectHexagon()
         {
             MainGrid.ShowNeighbors(ActiveHexCoordinate, SelectDirection);
-
-
         }
         public void PressAction()
         {
@@ -39,10 +48,9 @@ namespace Hexfall.Managers
         }
         public void SwipeAction(bool clockwise)
         {
+            MainGrid.ResetRotationCounter();
             MainGrid.RotateSelection(clockwise);
         }
-
-
 
         public void ChangeState(GameState newState)
         {
@@ -51,8 +59,8 @@ namespace Hexfall.Managers
             CurrentState = newState;
             switch (newState)
             {
-                case GameState.BreakAndFill:
-
+                case GameState.GameAwaitingStart:
+                    _uiManager.ResetScore();
                     break;
                 case GameState.CanInteract:
 
@@ -70,11 +78,15 @@ namespace Hexfall.Managers
                     throw new System.ArgumentException("Invalid game state selection.");
             }
         }
+        public void UpdateScore()
+        {
+            _uiManager.UpdateScore();
+        }
     }
     public enum GameState
     {
         GamePreStart = 0,
-        BreakAndFill = 1,
+        GameAwaitingStart = 1,
         CanInteract = 2,
         Rotation = 3,
         GameWon = 4,

@@ -6,15 +6,6 @@ using DG.Tweening;
 namespace Hexfall.HexElements
 {
     // "odd q" Vertical Layout
-
-    // creation, selection, remove vs şeklinde ufak classlara ayır
-
-    //eş bir renk bulduğunda bir eksiği ve bir fazlasını kontrol et
-
-    //merkeze bir obje yerleştir select dediğinde aktive olsun merkez pozisyona geçsin deaktivede deaktive olsun
-
-
-    //ayrımları düzgün yap; genel selection kısmı static olabilir sonraki önceki index vs mesela ya da valid grid selection gibi
     public class HexGridLayout : MonoBehaviour
     {
         public Hexagon[,] HexArray { get; private set; }
@@ -37,6 +28,9 @@ namespace Hexfall.HexElements
 
         private readonly float _movePositionDuration = 0.25f;
         private readonly float _explodeDelay = 0.4f;
+
+        private int _rotationCounter = 0;
+        private bool _clockwise;
 
         #region Grid Layout Initialization - Creation - Clearing
         public void Initialize(Vector2Int gridSize, GameObject hexagonObject, float disanceBetweenHex, float offscreenOffset, Color[] tileColor)
@@ -70,7 +64,6 @@ namespace Hexfall.HexElements
             newTile.Initialize(_tileColor[Random.Range(0, _tileColor.Length)], new Vector2Int(coordinateX, coordinateY), false);
 
             HexArray[coordinateX, coordinateY] = newTile;
-            //HexArray[coordinateX, coordinateY].SetNeighbors(_gridSize);
             newTile.transform.DOMoveY(HexInitialPosition(coordinateX, coordinateY).y - _offscreenOffset * _distanceMultiplier, _movePositionDuration).SetEase(Ease.OutCubic);
         }
         private Vector2 HexInitialPosition(int x, int y)
@@ -138,13 +131,27 @@ namespace Hexfall.HexElements
                 for (int i = 0; i < _hexagonToDestroy.Count; i++)
                 {
                     RemoveHexagon(_hexagonToDestroy[i].Coordinate);
+                    GameManager.instance.UpdateScore();
                 }
                 _hexagonToDestroy.Clear();
+                _rotationCounter = 0;
+                DeselectHexagon();
                 Invoke(nameof(ExplodeMatchingHexagons), _explodeDelay);
+
             }
             else
             {
                 _hexagonToDestroy.Clear();
+                if (_rotationCounter > 0)
+                {
+                    RotateSelection(_clockwise);
+                    _rotationCounter--;
+                }
+                else
+                {
+                    DeselectHexagon();
+                    GameManager.instance.ChangeState(GameState.CanInteract);
+                }
             }
         }
         private void ShouldExplode(Vector2Int coordinate)
@@ -224,7 +231,6 @@ namespace Hexfall.HexElements
                 Vector2Int newCoordinates = new Vector2Int(hexCoordinate.x, y - 1);
 
                 HexArray[hexCoordinate.x, y].SetCoordinates(newCoordinates);
-                //HexArray[hexCoordinate.x, y].SetNeighbors(_gridSize);
 
                 HexArray[newCoordinates.x, newCoordinates.y] = HexArray[hexCoordinate.x, y];
                 HexArray[hexCoordinate.x, y].transform.DOMoveY(HexInitialPosition(newCoordinates.x, newCoordinates.y).y - _offscreenOffset * _distanceMultiplier, _movePositionDuration);
@@ -238,7 +244,6 @@ namespace Hexfall.HexElements
             {
                 if (_selectedHexList[i] != null)
                     _selectedHexList[i].DeselectHexagon();
-
             }
             _selectedHexList.Clear();
         }
@@ -249,7 +254,6 @@ namespace Hexfall.HexElements
                 _selectedHexList[i].SelectHexagon();
             }
         }
-
         public void SelectValidNeighbors(int startPoint, int endPoint, Vector2Int[] neighborCoordinate)
         {
             if (NeighborIsValid(startPoint, neighborCoordinate) && NeighborIsValid(endPoint, neighborCoordinate))
@@ -274,23 +278,24 @@ namespace Hexfall.HexElements
             return index;
         }
         #endregion
-
+        public void ResetRotationCounter()
+        {
+            _rotationCounter = 2;
+        }
         public void RotateSelection(bool clockwise)
         {
             if (_selectedHexList.Count <= 0) return;
+            GameManager.instance.ChangeState(GameState.Rotation);
             Vector2Int[] previousCoordinate = new Vector2Int[3] { _selectedHexList[0].Coordinate, _selectedHexList[1].Coordinate, _selectedHexList[2].Coordinate };
             Hexagon[] previousHexagon = new Hexagon[3] { _selectedHexList[0], _selectedHexList[1], _selectedHexList[2] };
 
+            _clockwise = clockwise;
             if (clockwise)
             {
                 _selectedHexList[0].transform.DOMove(HexPosition(previousCoordinate[1].x, previousCoordinate[1].y), _movePositionDuration);
                 _selectedHexList[1].transform.DOMove(HexPosition(previousCoordinate[2].x, previousCoordinate[2].y), _movePositionDuration);
                 _selectedHexList[2].transform.DOMove(HexPosition(previousCoordinate[0].x, previousCoordinate[0].y), _movePositionDuration);
 
-                for(int i = 0; i < _selectedHexList.Count; i++)
-                {
-                    Debug.Log("previous "+i+ " = " +_selectedHexList[i].Coordinate);
-                }
 
                 HexArray[_selectedHexList[1].Coordinate.x, _selectedHexList[1].Coordinate.y] = previousHexagon[0];
                 HexArray[_selectedHexList[2].Coordinate.x, _selectedHexList[2].Coordinate.y] = previousHexagon[1];
@@ -299,25 +304,22 @@ namespace Hexfall.HexElements
                 _selectedHexList[0].SetCoordinates(previousCoordinate[1]);
                 _selectedHexList[1].SetCoordinates(previousCoordinate[2]);
                 _selectedHexList[2].SetCoordinates(previousCoordinate[0]);
-
-                for (int i = 0; i < _selectedHexList.Count; i++)
-                {
-                    Debug.Log("after " + i + " = " + _selectedHexList[i].Coordinate);
-                }
-
             }
-            //else
-            //{
-            //    _selectedHexList[0].gameObject.transform.DOMove(HexPosition(previousCoordinate[2].x, previousCoordinate[2].y), _movePositionDuration);
-            //    _selectedHexList[1].transform.DOMove(HexPosition(previousCoordinate[0].x, previousCoordinate[0].y), _movePositionDuration);
-            //    _selectedHexList[2].transform.DOMove(HexPosition(previousCoordinate[1].x, previousCoordinate[1].y), _movePositionDuration);
+            else
+            {
+                _selectedHexList[0].gameObject.transform.DOMove(HexPosition(previousCoordinate[2].x, previousCoordinate[2].y), _movePositionDuration);
+                _selectedHexList[1].transform.DOMove(HexPosition(previousCoordinate[0].x, previousCoordinate[0].y), _movePositionDuration);
+                _selectedHexList[2].transform.DOMove(HexPosition(previousCoordinate[1].x, previousCoordinate[1].y), _movePositionDuration);
 
-            //    _selectedHexList[0].SetCoordinates(previousCoordinate[2]);
-            //    _selectedHexList[1].SetCoordinates(previousCoordinate[0]);
-            //    _selectedHexList[2].SetCoordinates(previousCoordinate[1]);
-            //}
+                HexArray[_selectedHexList[2].Coordinate.x, _selectedHexList[2].Coordinate.y] = previousHexagon[0];
+                HexArray[_selectedHexList[0].Coordinate.x, _selectedHexList[0].Coordinate.y] = previousHexagon[1];
+                HexArray[_selectedHexList[1].Coordinate.x, _selectedHexList[1].Coordinate.y] = previousHexagon[2];
+
+                _selectedHexList[0].SetCoordinates(previousCoordinate[2]);
+                _selectedHexList[1].SetCoordinates(previousCoordinate[0]);
+                _selectedHexList[2].SetCoordinates(previousCoordinate[1]);
+            }
             AssignAllNeighbors();
-            DeselectHexagon();
             Invoke(nameof(ExplodeMatchingHexagons), _movePositionDuration+0.1f);
         }
         private void AssignAllNeighbors()
@@ -331,11 +333,4 @@ namespace Hexfall.HexElements
             }
         }
     }
-
-
-
-
-
-
-
 }

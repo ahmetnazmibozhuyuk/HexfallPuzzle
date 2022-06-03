@@ -1,4 +1,5 @@
 using UnityEngine;
+using Hexfall.Managers;
 
 namespace Hexfall.HexElements
 {
@@ -15,12 +16,12 @@ namespace Hexfall.HexElements
 
         public void SpawnNewGrid()
         {
-
+            GameManager.instance.ChangeState(GameState.GameAwaitingStart);
             ClearGrid();
             _hexGridMainLayout = gameObject.AddComponent<HexGridLayout>();
             _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,offscreenOffset, tileColor);
         }
-        public void ClearGrid()
+        private void ClearGrid()
         {
             if (_hexGridMainLayout != null) _hexGridMainLayout.ClearEverything();
         }

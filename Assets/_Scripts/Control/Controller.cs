@@ -12,6 +12,7 @@ namespace Hexfall.Control
 
         private void Update()
         {
+            if (GameManager.instance.CurrentState != GameState.CanInteract) return;
             SelectHex();
         }
         private void SelectHex()

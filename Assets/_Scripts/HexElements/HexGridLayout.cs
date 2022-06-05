@@ -32,6 +32,8 @@ namespace Hexfall.HexElements
         private int _rotationCounter = 0;
         private bool _clockwise;
 
+        public bool ShouldSpawnBomb = false;
+
         #region Grid Layout Initialization - Creation - Clearing
         public void Initialize(Vector2Int gridSize, GameObject hexagonObject, float disanceBetweenHex, float offscreenOffset, Color[] tileColor)
         {
@@ -61,10 +63,14 @@ namespace Hexfall.HexElements
         {
             Hexagon newTile = ObjectPool.Spawn(_hexagon, HexInitialPosition(coordinateX, coordinateY), transform.rotation).GetComponent<Hexagon>();
 
-            newTile.Initialize(_tileColor[Random.Range(0, _tileColor.Length)], new Vector2Int(coordinateX, coordinateY), false);
-
+            newTile.Initialize(_tileColor[Random.Range(0, _tileColor.Length)], new Vector2Int(coordinateX, coordinateY));
             HexArray[coordinateX, coordinateY] = newTile;
             newTile.transform.DOMoveY(HexInitialPosition(coordinateX, coordinateY).y - _offscreenOffset * _distanceMultiplier, _movePositionDuration).SetEase(Ease.OutCubic);
+            if (ShouldSpawnBomb)
+            {
+                newTile.SetAsBombHexagon();
+                ShouldSpawnBomb = false;
+            }
         }
         private Vector2 HexInitialPosition(int x, int y)
         {
@@ -137,6 +143,7 @@ namespace Hexfall.HexElements
                 _rotationCounter = 0;
                 DeselectHexagon();
                 Invoke(nameof(ExplodeMatchingHexagons), _explodeDelay);
+                GameManager.instance.ExplosionTick();
 
             }
             else

@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &68631507340607919
 Transform:
   m_ObjectHideFlags: 0
@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highLightSprite: {fileID: 5289071287503793219}
+  bombSprite: {fileID: 1382954402508380444}
 --- !u!60 &8106033062353582300
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -294,7 +295,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 3f07c33e4686ddc4d8d4af8592b1ab23, type: 3}
-  m_Color: {r: 0.20274048, g: 0.2015842, b: 0.2830189, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

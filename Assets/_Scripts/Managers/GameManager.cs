@@ -14,6 +14,11 @@ namespace Hexfall.Managers
         public Vector2Int ActiveHexCoordinate { get; private set; }
         public Vector2Int SelectDirection { get; private set; }
         private UIManager _uiManager;
+
+        private int _scoreCounter;
+
+        private int _explosionCounter = 5;
+        private bool _bombIsActive = false;
         protected override void Awake()
         {
             base.Awake();
@@ -81,6 +86,34 @@ namespace Hexfall.Managers
         public void UpdateScore()
         {
             _uiManager.UpdateScore();
+            if(_uiManager.Score % 200 == 0 && _uiManager.Score != 0)
+            {
+                MainGrid.ShouldSpawnBomb = true;
+            }
+        }
+        public void CancelExplosion()
+        {
+            _bombIsActive = false;
+            _uiManager.DeactivateBomb();
+        }
+        public void StartExplosionClock(int explosionCounter)
+        {
+            _explosionCounter = explosionCounter;
+            _bombIsActive = true;
+            _uiManager.ActivateBomb(explosionCounter);
+        }
+        public void ExplosionTick()
+        {
+            if (!_bombIsActive) return;
+            _explosionCounter--;
+            _uiManager.BombTick(_explosionCounter);
+            if (_explosionCounter < 0)
+                LoseGame();
+        }
+        private void LoseGame()
+        {
+            ChangeState(GameState.GameLost);
+            _uiManager.LoseGame();
         }
     }
     public enum GameState

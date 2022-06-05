@@ -5,17 +5,34 @@ namespace Hexfall.HexElements
 {
     public class Hexagon : MonoBehaviour
     {
-        public Color HexColor { get; private set; } // random seçilecek
+        public Color HexColor { get; private set; }
         public Vector2Int Coordinate { get; private set; }
         public Vector2Int[] NeighborCoordinate { get; private set; }
 
         [SerializeField] private GameObject highLightSprite;
+        [SerializeField] private GameObject bombSprite;
 
-        public void Initialize(Color hexColor, Vector2Int coordinate, bool isHighlighted) // color yerine tile type al
+
+        private bool _isBomb;
+        public void Initialize(Color hexColor, Vector2Int coordinate)
         {
             SetCoordinates(coordinate);
             SetColor(hexColor);
-            highLightSprite.SetActive(isHighlighted);
+            highLightSprite.SetActive(false);
+            bombSprite.SetActive(false);
+        }
+        public void SetAsBombHexagon()
+        {
+            bombSprite.SetActive(true);
+            _isBomb = true;
+            GameManager.instance.StartExplosionClock(5);
+        }
+        private void OnDisable()
+        {
+            if (_isBomb)
+            {
+                GameManager.instance.CancelExplosion();
+            }
         }
 
         public void SetCoordinates(Vector2Int coordinate)
@@ -54,7 +71,6 @@ namespace Hexfall.HexElements
         public void SelectHexagon()
         {
             highLightSprite.SetActive(true);
-            //Debug.Log(Coordinate);
         }
         public void DeselectHexagon()
         {

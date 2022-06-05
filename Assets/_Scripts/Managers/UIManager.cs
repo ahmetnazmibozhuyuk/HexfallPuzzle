@@ -7,7 +7,7 @@ namespace Hexfall.Managers
     {
         [SerializeField] private TextMeshProUGUI scoreText;
         [SerializeField] private TextMeshProUGUI bombText;
-        [SerializeField] private TextMeshProUGUI lostText;
+        [SerializeField] private GameObject lostText;
         public int Score { get; private set; }
 
         public void UpdateScore()
@@ -16,10 +16,15 @@ namespace Hexfall.Managers
             Score += 5;
             scoreText.SetText("Score: " + Score);
         }
-        public void ResetScore()
+        private void ResetScore()
         {
             Score = 0;
             scoreText.SetText("Score: " + Score);
+        }
+        public void InitializeGame()
+        {
+            ResetScore();
+            lostText.SetActive(false);
         }
         public void ActivateBomb(int counter)
         {
@@ -37,7 +42,7 @@ namespace Hexfall.Managers
         }
         public void LoseGame()
         {
-            lostText.gameObject.SetActive(true);
+            lostText.SetActive(true);
         }
     }
 }

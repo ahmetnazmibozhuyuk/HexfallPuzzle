@@ -13,6 +13,8 @@ namespace Hexfall.Managers
         
         public Vector2Int ActiveHexCoordinate { get; private set; }
         public Vector2Int SelectDirection { get; private set; }
+        public Hexagon BombHexagon { get; private set; }
+
         private UIManager _uiManager;
 
         private int _scoreCounter;
@@ -65,7 +67,7 @@ namespace Hexfall.Managers
             switch (newState)
             {
                 case GameState.GameAwaitingStart:
-                    _uiManager.ResetScore();
+                    _uiManager.InitializeGame();
                     break;
                 case GameState.CanInteract:
 
@@ -107,13 +109,22 @@ namespace Hexfall.Managers
             if (!_bombIsActive) return;
             _explosionCounter--;
             _uiManager.BombTick(_explosionCounter);
-            if (_explosionCounter < 0)
+            if (_explosionCounter < 1)
                 LoseGame();
         }
         private void LoseGame()
         {
             ChangeState(GameState.GameLost);
             _uiManager.LoseGame();
+        }
+
+        public void SetBombHexagon(Hexagon hexagon)
+        {
+            BombHexagon = hexagon;
+        }
+        public void RemoveBombHexagon()
+        {
+            BombHexagon = null;
         }
     }
     public enum GameState

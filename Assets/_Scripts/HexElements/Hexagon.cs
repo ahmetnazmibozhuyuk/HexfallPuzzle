@@ -20,18 +20,21 @@ namespace Hexfall.HexElements
             SetColor(hexColor);
             highLightSprite.SetActive(false);
             bombSprite.SetActive(false);
+            _isBomb = false;
         }
         public void SetAsBombHexagon()
         {
             bombSprite.SetActive(true);
             _isBomb = true;
-            GameManager.instance.StartExplosionClock(5);
+            GameManager.instance.StartExplosionClock(7);
+            GameManager.instance.SetBombHexagon(this);
         }
         private void OnDisable()
         {
             if (_isBomb)
             {
                 GameManager.instance.CancelExplosion();
+                GameManager.instance.RemoveBombHexagon();
             }
         }
 

@@ -5,15 +5,17 @@ namespace Hexfall.Managers
 {
     public class UIManager : MonoBehaviour
     {
+        public int Score { get; private set; }
+
+        [SerializeField] private int singleExplosionScore = 5;
+
         [SerializeField] private TextMeshProUGUI scoreText;
         [SerializeField] private TextMeshProUGUI bombText;
         [SerializeField] private GameObject lostText;
-        public int Score { get; private set; }
-
         public void UpdateScore()
         {
             if (GameManager.instance.CurrentState == GameState.GameAwaitingStart) return;
-            Score += 5;
+            Score += singleExplosionScore;
             scoreText.SetText("Score: " + Score);
         }
         private void ResetScore()
@@ -38,7 +40,6 @@ namespace Hexfall.Managers
         public void BombTick(int counter)
         {
             bombText.SetText("BOMB IS ACTIVE\nRemaining Moves: " + counter);
-
         }
         public void LoseGame()
         {

@@ -79,6 +79,7 @@ namespace Hexfall.HexElements
         {
             highLightSprite.SetActive(false);
         }
+
         private void OnMouseEnter()
         {
             GameManager.instance.SetActiveHex(Coordinate);

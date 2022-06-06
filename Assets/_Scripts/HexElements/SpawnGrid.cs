@@ -12,6 +12,8 @@ namespace Hexfall.HexElements
 
         [SerializeField] private Color[] tileColor;
 
+        [SerializeField] private int scoreTresholdForBomb = 1000;
+
         private HexGridLayout _hexGridMainLayout;
 
         public void SpawnNewGrid()
@@ -19,7 +21,7 @@ namespace Hexfall.HexElements
             GameManager.instance.ChangeState(GameState.GameAwaitingStart);
             ClearGrid();
             _hexGridMainLayout = gameObject.AddComponent<HexGridLayout>();
-            _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,offscreenOffset, tileColor);
+            _hexGridMainLayout.Initialize(gridSize, hexagonObject, distanceBetweenHex,offscreenOffset, tileColor, scoreTresholdForBomb);
         }
         private void ClearGrid()
         {

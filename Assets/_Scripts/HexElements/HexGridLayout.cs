@@ -9,6 +9,7 @@ namespace Hexfall.HexElements
     public class HexGridLayout : MonoBehaviour
     {
         public Hexagon[,] HexArray { get; private set; }
+        public int ScoreTresholdForBomb { get; private set; }
 
         private const float SQRT_3 = 1.732050808f;
 
@@ -38,13 +39,14 @@ namespace Hexfall.HexElements
 
 
         #region Grid Layout Initialization - Creation - Clearing
-        public void Initialize(Vector2Int gridSize, GameObject hexagonObject, float disanceBetweenHex, float offscreenOffset, Color[] tileColor)
+        public void Initialize(Vector2Int gridSize, GameObject hexagonObject, float disanceBetweenHex, float offscreenOffset, Color[] tileColor, int scoreTresholdForBomb)
         {
             _gridSize = gridSize;
             _hexagon = hexagonObject;
             _distanceMultiplier = disanceBetweenHex;
             _offscreenOffset = offscreenOffset;
             _tileColor = tileColor;
+            ScoreTresholdForBomb = scoreTresholdForBomb;
             CreateGrid();
             GameManager.instance.AssignMainGrid(this);
 
@@ -94,17 +96,6 @@ namespace Hexfall.HexElements
                 return new Vector2(x * 3, y * 2 * SQRT_3 + _offscreenOffset) * _distanceMultiplier;
             }
         }
-        private Vector2 HexPosition(int x, int y)
-        {
-            if (x % 2 == 1)
-            {
-                return new Vector2(x * 3, y * 2 * SQRT_3 - SQRT_3) * _distanceMultiplier;
-            }
-            else
-            {
-                return new Vector2(x * 3, y * 2 * SQRT_3) * _distanceMultiplier;
-            }
-        }
         public void ClearEverything()
         {
             for (int i = 0; i < HexArray.GetLength(0); i++)
@@ -134,62 +125,7 @@ namespace Hexfall.HexElements
         {
             return HexArray[HexArray[baseCoordinate.x, baseCoordinate.y].NeighborCoordinate[neighborIndex].x, HexArray[baseCoordinate.x, baseCoordinate.y].NeighborCoordinate[neighborIndex].y];
         }
-        public void ExplodeMatchingHexagons()
-        {
-            for (int i = 0; i < HexArray.GetLength(0); i++)
-            {
-                for (int j = 0; j < HexArray.GetLength(1); j++)
-                {
-                    ShouldExplode(HexArray[i, j].Coordinate);
-                }
-            }
-            if (_hexagonToDestroy.Count > 2)
-            {
-                for (int i = 0; i < _hexagonToDestroy.Count; i++)
-                {
-                    RemoveHexagon(_hexagonToDestroy[i].Coordinate);
-                    GameManager.instance.UpdateScore();
-                }
-                _hexagonToDestroy.Clear();
-                _rotationCounter = 0;
-                DeselectHexagon();
-                Invoke(nameof(ExplodeMatchingHexagons), _explodeDelay);
-                _moveIsMade = true;
 
-            }
-            else
-            {
-                _hexagonToDestroy.Clear();
-                if (_rotationCounter > 0)
-                {
-                    RotateSelection(_clockwise);
-                    _rotationCounter--;
-                }
-                else
-                {
-                    DeselectHexagon();
-                    GameManager.instance.ChangeState(GameState.CanInteract);
-                    if (_moveIsMade)
-                    {
-                        GameManager.instance.ExplosionTick();
-                        _moveIsMade = false;
-                    }
-                }
-            }
-        }
-        private void ShouldExplode(Vector2Int coordinate)
-        {
-            Color selectedColor = HexArray[coordinate.x, coordinate.y].HexColor;
-            Vector2Int[] neighborCoordinate = HexArray[coordinate.x, coordinate.y].NeighborCoordinate;
-            for (int i = 0; i < 6; i++)
-            {
-                if (!NeighborIsValid(i, neighborCoordinate)) continue;
-                if (selectedColor == Neighbor(coordinate, i).HexColor)
-                {
-                    CheckNeighborConnection(coordinate, i, selectedColor);
-                }
-            }
-        }
         private bool NeighborIsValid(int neighborIndex, Vector2Int[] neighborCoordinate)
         {
             return neighborCoordinate[neighborIndex].x >= 0 && neighborCoordinate[neighborIndex].y >= 0 &&
@@ -246,21 +182,6 @@ namespace Hexfall.HexElements
             }
         }
 
-        public void RemoveHexagon(Vector2Int hexCoordinate)
-        {
-            ObjectPool.Despawn(HexArray[hexCoordinate.x, hexCoordinate.y].gameObject);
-            for (int y = hexCoordinate.y + 1; y < HexArray.GetLength(1); y++)
-            {
-                Vector2Int newCoordinates = new Vector2Int(hexCoordinate.x, y - 1);
-
-                HexArray[hexCoordinate.x, y].SetCoordinates(newCoordinates);
-
-                HexArray[newCoordinates.x, newCoordinates.y] = HexArray[hexCoordinate.x, y];
-                HexArray[hexCoordinate.x, y].transform.DOMoveY(HexInitialPosition(newCoordinates.x, newCoordinates.y).y - _offscreenOffset * _distanceMultiplier, _movePositionDuration);
-            }
-            CreateTile(hexCoordinate.x, HexArray.GetLength(1) - 1);
-        }
-
         public void DeselectHexagon()
         {
             for (int i = 0; i < _selectedHexList.Count; i++)
@@ -301,6 +222,8 @@ namespace Hexfall.HexElements
             return index;
         }
         #endregion
+
+        #region Rotation
         public void ResetRotationCounter()
         {
             _rotationCounter = 2;
@@ -343,7 +266,7 @@ namespace Hexfall.HexElements
                 _selectedHexList[2].SetCoordinates(previousCoordinate[1]);
             }
             AssignAllNeighbors();
-            Invoke(nameof(ExplodeMatchingHexagons), _movePositionDuration+0.1f);
+            Invoke(nameof(ExplodeMatchingHexagons), _movePositionDuration + 0.1f);
         }
         private void AssignAllNeighbors()
         {
@@ -355,5 +278,90 @@ namespace Hexfall.HexElements
                 }
             }
         }
+        private Vector2 HexPosition(int x, int y)
+        {
+            if (x % 2 == 1)
+            {
+                return new Vector2(x * 3, y * 2 * SQRT_3 - SQRT_3) * _distanceMultiplier;
+            }
+            else
+            {
+                return new Vector2(x * 3, y * 2 * SQRT_3) * _distanceMultiplier;
+            }
+        }
+        #endregion
+
+        #region Explosion
+        public void ExplodeMatchingHexagons()
+        {
+            for (int i = 0; i < HexArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < HexArray.GetLength(1); j++)
+                {
+                    ShouldExplode(HexArray[i, j].Coordinate);
+                }
+            }
+            if (_hexagonToDestroy.Count > 2)
+            {
+                for (int i = 0; i < _hexagonToDestroy.Count; i++)
+                {
+                    RemoveHexagon(_hexagonToDestroy[i].Coordinate);
+                    GameManager.instance.UpdateScore();
+                }
+                _hexagonToDestroy.Clear();
+                _rotationCounter = 0;
+                DeselectHexagon();
+                Invoke(nameof(ExplodeMatchingHexagons), _explodeDelay);
+                _moveIsMade = true;
+
+            }
+            else
+            {
+                _hexagonToDestroy.Clear();
+                if (_rotationCounter > 0)
+                {
+                    RotateSelection(_clockwise);
+                    _rotationCounter--;
+                }
+                else
+                {
+                    DeselectHexagon();
+                    GameManager.instance.ChangeState(GameState.CanInteract);
+                    if (_moveIsMade)
+                    {
+                        GameManager.instance.ExplosionTick();
+                        _moveIsMade = false;
+                    }
+                }
+            }
+        }
+        public void RemoveHexagon(Vector2Int hexCoordinate)
+        {
+            ObjectPool.Despawn(HexArray[hexCoordinate.x, hexCoordinate.y].gameObject);
+            for (int y = hexCoordinate.y + 1; y < HexArray.GetLength(1); y++)
+            {
+                Vector2Int newCoordinates = new Vector2Int(hexCoordinate.x, y - 1);
+
+                HexArray[hexCoordinate.x, y].SetCoordinates(newCoordinates);
+
+                HexArray[newCoordinates.x, newCoordinates.y] = HexArray[hexCoordinate.x, y];
+                HexArray[hexCoordinate.x, y].transform.DOMoveY(HexInitialPosition(newCoordinates.x, newCoordinates.y).y - _offscreenOffset * _distanceMultiplier, _movePositionDuration);
+            }
+            CreateTile(hexCoordinate.x, HexArray.GetLength(1) - 1);
+        }
+        private void ShouldExplode(Vector2Int coordinate)
+        {
+            Color selectedColor = HexArray[coordinate.x, coordinate.y].HexColor;
+            Vector2Int[] neighborCoordinate = HexArray[coordinate.x, coordinate.y].NeighborCoordinate;
+            for (int i = 0; i < 6; i++)
+            {
+                if (!NeighborIsValid(i, neighborCoordinate)) continue;
+                if (selectedColor == Neighbor(coordinate, i).HexColor)
+                {
+                    CheckNeighborConnection(coordinate, i, selectedColor);
+                }
+            }
+        }
+        #endregion
     }
 }

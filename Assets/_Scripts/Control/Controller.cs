@@ -26,8 +26,6 @@ namespace Hexfall.Control
                 _releasePosition = Input.mousePosition;
                 SwipeOrPress();
             }
-
-
         }
         private void SwipeOrPress()
         {

@@ -1,6 +1,5 @@
 ﻿using Hexfall.HexElements;
 using UnityEngine;
-using TMPro;
 
 namespace Hexfall.Managers
 {
@@ -17,9 +16,8 @@ namespace Hexfall.Managers
 
         private UIManager _uiManager;
 
-        private int _scoreCounter;
-
         private int _explosionCounter = 5;
+
         private bool _bombIsActive = false;
         protected override void Awake()
         {
@@ -30,35 +28,11 @@ namespace Hexfall.Managers
         {
             ChangeState(GameState.GameAwaitingStart);
         }
-
-        public void SetActiveHex( Vector2Int activeHexCoordinate)
-        {
-            ActiveHexCoordinate = activeHexCoordinate;
-        }
-        public void SetSelectDirection(Vector2Int selectDirection)
-        {
-            SelectDirection = selectDirection;
-        }
-
-        public void AssignMainGrid( HexGridLayout gridToAssign)
+        public void AssignMainGrid(HexGridLayout gridToAssign)
         {
             MainGrid = gridToAssign;
         }
-
-        private void SelectHexagon()
-        {
-            MainGrid.ShowNeighbors(ActiveHexCoordinate, SelectDirection);
-        }
-        public void PressAction()
-        {
-            SelectHexagon();
-        }
-        public void SwipeAction(bool clockwise)
-        {
-            MainGrid.ResetRotationCounter();
-            MainGrid.RotateSelection(clockwise);
-        }
-
+        #region Game State Related
         public void ChangeState(GameState newState)
         {
             if (CurrentState == newState) return;
@@ -79,20 +53,47 @@ namespace Hexfall.Managers
 
                     break;
                 case GameState.GameLost:
-
+                    GameLost();
                     break;
                 default:
                     throw new System.ArgumentException("Invalid game state selection.");
             }
         }
-        public void UpdateScore()
+        private void GameLost()
         {
-            _uiManager.UpdateScore();
-            if(_uiManager.Score % 200 == 0 && _uiManager.Score != 0)
-            {
-                MainGrid.ShouldSpawnBomb = true;
-            }
+            _uiManager.LoseGame();
         }
+        #endregion
+
+        #region Selection Related
+        public void SetActiveHex( Vector2Int activeHexCoordinate)
+        {
+            ActiveHexCoordinate = activeHexCoordinate;
+        }
+        public void SetSelectDirection(Vector2Int selectDirection)
+        {
+            SelectDirection = selectDirection;
+        }
+        #endregion
+
+        #region Input Related
+        private void SelectHexagon()
+        {
+            MainGrid.ShowNeighbors(ActiveHexCoordinate, SelectDirection);
+        }
+        public void PressAction()
+        {
+            SelectHexagon();
+        }
+        public void SwipeAction(bool clockwise)
+        {
+            MainGrid.ResetRotationCounter();
+            MainGrid.RotateSelection(clockwise);
+        }
+
+        #endregion
+
+        #region Explosion Related
         public void CancelExplosion()
         {
             _bombIsActive = false;
@@ -104,20 +105,6 @@ namespace Hexfall.Managers
             _bombIsActive = true;
             _uiManager.ActivateBomb(explosionCounter);
         }
-        public void ExplosionTick()
-        {
-            if (!_bombIsActive) return;
-            _explosionCounter--;
-            _uiManager.BombTick(_explosionCounter);
-            if (_explosionCounter < 1)
-                LoseGame();
-        }
-        private void LoseGame()
-        {
-            ChangeState(GameState.GameLost);
-            _uiManager.LoseGame();
-        }
-
         public void SetBombHexagon(Hexagon hexagon)
         {
             BombHexagon = hexagon;
@@ -126,6 +113,25 @@ namespace Hexfall.Managers
         {
             BombHexagon = null;
         }
+        public void ExplosionTick()
+        {
+            if (!_bombIsActive) return;
+            _explosionCounter--;
+            _uiManager.BombTick(_explosionCounter);
+            if (_explosionCounter < 1)
+                ChangeState(GameState.GameLost);
+        }
+        #endregion
+
+        public void UpdateScore()
+        {
+            _uiManager.UpdateScore();
+            if (_uiManager.Score % MainGrid.ScoreTresholdForBomb == 0 && _uiManager.Score != 0)
+            {
+                MainGrid.ShouldSpawnBomb = true;
+            }
+        }
+
     }
     public enum GameState
     {
